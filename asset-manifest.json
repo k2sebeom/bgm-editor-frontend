@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/bgm-editor-frontend/static/css/main.bb0bb678.css",
-    "main.js": "/bgm-editor-frontend/static/js/main.2f9f5c03.js",
+    "main.js": "/bgm-editor-frontend/static/js/main.da317fa9.js",
     "index.html": "/bgm-editor-frontend/index.html",
     "main.bb0bb678.css.map": "/bgm-editor-frontend/static/css/main.bb0bb678.css.map",
-    "main.2f9f5c03.js.map": "/bgm-editor-frontend/static/js/main.2f9f5c03.js.map"
+    "main.da317fa9.js.map": "/bgm-editor-frontend/static/js/main.da317fa9.js.map"
   },
   "entrypoints": [
     "static/css/main.bb0bb678.css",
-    "static/js/main.2f9f5c03.js"
+    "static/js/main.da317fa9.js"
   ]
 }
