@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import './App.css'
 import { Slider } from '@mui/material';
 import { FileUploader } from 'react-drag-drop-files';
-import { fetchMetrics } from './api';
+import { fetchMetrics, fetchSongs } from './api';
 
 
 type Bgm = {
@@ -20,7 +20,17 @@ type BgmSliderProps = {
   metrics: any;
 }
 
+type Song = {
+  id: number;
+  title: string;
+  artist: string;
+  url: string;
+}
+
 function BgmSlider({bgm, onChange, onRemove, duration, metrics}: BgmSliderProps) {
+  const [songs, setSongs] = useState<Song[]>([]);
+
+
   return (
     <div style={{
       width: '100%'
@@ -63,14 +73,24 @@ function BgmSlider({bgm, onChange, onRemove, duration, metrics}: BgmSliderProps)
           }
         </select>
 
-        <button>Search</button>
+        <button
+          onClick={async () => {
+            const resp = await fetchSongs(bgm.mood, bgm.genre);
+            setSongs(resp.data);
+          }}
+        >Search</button>
 
         <label htmlFor="aclip">Choose a car:</label>
-        <select name="aclip" id="cars">
-          <option value="volvo">Volvo</option>
-          <option value="saab">Saab</option>
-          <option value="mercedes">Mercedes</option>
-          <option value="audi">Audi</option>
+        <select name="aclip" id="aclip" value={bgm.clipId} onChange={(e) => {
+          const newBgm = { ...bgm };
+          newBgm.clipId = parseInt(e.target.value);
+          onChange(newBgm);
+        }}>
+          {
+            songs.map((s: any) => {
+              return <option key={`clip-${s.title}`} value={s.id}>{s.title} by {s.artist}</option>
+            })
+          }
         </select>
 
         <button style={{
