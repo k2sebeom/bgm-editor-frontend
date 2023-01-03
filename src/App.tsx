@@ -128,6 +128,9 @@ function App() {
   const [bgms, setBgms] = useState<Bgm[]>([]);
   const [duration, setDuration] = useState<number>(0);
 
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [processedUrl, setProcessedUrl] = useState<string>('');
+
   useEffect(() => {
     fetchMetrics().then((data) => {
       setMetrics(data.data);
@@ -225,11 +228,23 @@ function App() {
         })
       }}>New BGM</button>
 
-      <button onClick={async () => {
+      <button disabled={isProcessing} onClick={async () => {
         if(videoFile !== null) {
-          await submitVideo(videoFile, bgms);
+          setProcessedUrl('');
+          setIsProcessing(true);
+          const data = await submitVideo(videoFile, bgms);
+          setProcessedUrl(URL.createObjectURL(data));
+          setIsProcessing(false);
         }
-      }}>Generate</button>
+      }}>{!isProcessing ? "Generate" : "Processing..."}</button>
+      {
+        processedUrl.length > 0 ? (
+          <div>
+            <video src={processedUrl} controls></video>
+            <a download={`bgm-${videoFile?.name}`} href={processedUrl}><button>Download</button></a>
+          </div>
+        ) : null
+      }
     </div>
   );
 }

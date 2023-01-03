@@ -26,6 +26,7 @@ export async function submitVideo(file: File, bgms: any) {
         method: "post",
         data: formData,
         headers: { "Content-Type": "multipart/form-data" },
+        responseType: 'blob'
     });
-    console.log(resp.data);
+    return resp.data;
 }
