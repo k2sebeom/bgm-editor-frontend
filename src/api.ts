@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const BASE_URL = 'http://localhost:8000' // 'http://3.139.108.166';
+export const BASE_URL = 'http://3.139.108.166';
 
 
 export async function fetchMetrics(): Promise<any> {
