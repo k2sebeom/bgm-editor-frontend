@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import './App.css'
 import { Slider } from '@mui/material';
 import { FileUploader } from 'react-drag-drop-files';
-import { BASE_URL, fetchMetrics, fetchSongs } from './api';
+import { BASE_URL, fetchMetrics, fetchSongs, submitVideo } from './api';
 
 
 type Bgm = {
@@ -224,6 +224,12 @@ function App() {
           return newBgm;
         })
       }}>New BGM</button>
+
+      <button onClick={async () => {
+        if(videoFile !== null) {
+          await submitVideo(videoFile, bgms);
+        }
+      }}>Generate</button>
     </div>
   );
 }
