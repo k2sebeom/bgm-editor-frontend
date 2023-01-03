@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const BASE_URL = 'http://editor.museli.o-r.kr';
+export const BASE_URL = 'https://editor.museli.o-r.kr';
 
 
 export async function fetchMetrics(): Promise<any> {
