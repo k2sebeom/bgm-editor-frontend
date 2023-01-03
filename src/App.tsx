@@ -1,7 +1,8 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './App.css'
 import { Slider } from '@mui/material';
 import { FileUploader } from 'react-drag-drop-files';
+import { fetchMetrics } from './api';
 
 
 type Bgm = {
@@ -13,9 +14,10 @@ type Bgm = {
 type BgmSliderProps = {
   onRemove: () => void;
   duration: number;
+  metrics: any;
 }
 
-function BgmSlider({onRemove, duration}: BgmSliderProps) {
+function BgmSlider({onRemove, duration, metrics}: BgmSliderProps) {
   const [val, setVal] = useState<number[]>([0, 10]);
 
   return (
@@ -34,18 +36,20 @@ function BgmSlider({onRemove, duration}: BgmSliderProps) {
       <div className='hstack'>
         <label htmlFor="genre">Genre:</label>
         <select name="genre" id="genre">
-          <option value="volvo">Volvo</option>
-          <option value="saab">Saab</option>
-          <option value="mercedes">Mercedes</option>
-          <option value="audi">Audi</option>
+          {
+            metrics.genre.map((g: any) => {
+              return <option key={`genre-${g}`} value={g}>{g}</option>
+            })
+          }
         </select>
 
         <label htmlFor="mood">Mood:</label>
         <select name="mood" id="mood">
-          <option value="volvo">Volvo</option>
-          <option value="saab">Saab</option>
-          <option value="mercedes">Mercedes</option>
-          <option value="audi">Audi</option>
+          {
+            metrics.mood.map((m: any) => {
+              return <option key={`mood-${m}`} value={m}>{m}</option>
+            })
+          }
         </select>
 
         <button>Search</button>
@@ -74,11 +78,19 @@ function App() {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoUrl, setVideoUrl] = useState<string>('');
 
+  const [metrics, setMetrics] = useState<any>({ genre: [], mood: []});
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const [currentTime, setCurrentTime] = useState<number>(0);
 
   const [bgms, setBgms] = useState<Bgm[]>([]);
   const [duration, setDuration] = useState<number>(0);
+
+  useEffect(() => {
+    fetchMetrics().then((data) => {
+      setMetrics(data.data);
+    })
+  }, []);
 
   return (
     <div className='container'>
@@ -136,6 +148,7 @@ function App() {
         bgms.map((bgm: Bgm, i: number) => {
           return (
             <BgmSlider
+              metrics={metrics}
               key={`bgm-slider-${i}`}
               duration={duration}
               onRemove={() => {
