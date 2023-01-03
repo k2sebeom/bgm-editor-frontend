@@ -10,6 +10,7 @@ type Bgm = {
   genre: string;
   mood: string;
   clipId?: number;
+  songs: Song[];
 }
 
 type BgmSliderProps = {
@@ -28,9 +29,6 @@ type Song = {
 }
 
 function BgmSlider({bgm, onChange, onRemove, duration, metrics}: BgmSliderProps) {
-  const [songs, setSongs] = useState<Song[]>([]);
-
-
   return (
     <div style={{
       width: '100%'
@@ -76,7 +74,9 @@ function BgmSlider({bgm, onChange, onRemove, duration, metrics}: BgmSliderProps)
         <button
           onClick={async () => {
             const resp = await fetchSongs(bgm.mood, bgm.genre);
-            setSongs(resp.data);
+            const newBgm = { ...bgm };
+            newBgm.songs = resp.data;
+            onChange(newBgm);
           }}
         >Search</button>
 
@@ -87,7 +87,7 @@ function BgmSlider({bgm, onChange, onRemove, duration, metrics}: BgmSliderProps)
           onChange(newBgm);
         }}>
           {
-            songs.map((s: any) => {
+            bgm.songs.map((s: any) => {
               return <option key={`clip-${s.title}`} value={s.id}>{s.title} by {s.artist}</option>
             })
           }
@@ -99,7 +99,6 @@ function BgmSlider({bgm, onChange, onRemove, duration, metrics}: BgmSliderProps)
           onClick={onRemove}
         >Remove</button>
       </div>
-      
     </div>
   )
 }
@@ -209,7 +208,7 @@ function App() {
 
       <button onClick={() => {
         setBgms((prev: Bgm[]) => {
-          const newBgm = [...prev, { range: [0, 0], genre: metrics.genre[0], mood: metrics.mood[0] }];
+          const newBgm = [...prev, { range: [0, 0], genre: metrics.genre[0], mood: metrics.mood[0], songs: [] }];
           return newBgm;
         })
       }}>New BGM</button>
