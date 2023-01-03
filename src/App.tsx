@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import './App.css'
 import { Slider } from '@mui/material';
 import { FileUploader } from 'react-drag-drop-files';
-import { fetchMetrics, fetchSongs } from './api';
+import { BASE_URL, fetchMetrics, fetchSongs } from './api';
 
 
 type Bgm = {
@@ -29,6 +29,8 @@ type Song = {
 }
 
 function BgmSlider({bgm, onChange, onRemove, duration, metrics}: BgmSliderProps) {
+  const [audioUrl, setAudioUrl] = useState<string>('');
+
   return (
     <div style={{
       width: '100%'
@@ -76,23 +78,28 @@ function BgmSlider({bgm, onChange, onRemove, duration, metrics}: BgmSliderProps)
             const resp = await fetchSongs(bgm.mood, bgm.genre);
             const newBgm = { ...bgm };
             newBgm.songs = resp.data;
+            newBgm.clipId = newBgm.songs[0].id;
             onChange(newBgm);
+            setAudioUrl(BASE_URL + newBgm.songs[0].url);
           }}
         >Search</button>
 
         <label htmlFor="aclip">Choose a car:</label>
         <select name="aclip" id="aclip" value={bgm.clipId} onChange={(e) => {
           const newBgm = { ...bgm };
-          newBgm.clipId = parseInt(e.target.value);
+          const index = parseInt(e.target.value);
+          newBgm.clipId = bgm.songs[index].id;
+          console.log(bgm.songs[index])
+          setAudioUrl(BASE_URL + bgm.songs[index].url);
           onChange(newBgm);
         }}>
           {
-            bgm.songs.map((s: any) => {
-              return <option key={`clip-${s.title}`} value={s.id}>{s.title} by {s.artist}</option>
+            bgm.songs.map((s: any, i: number) => {
+              return <option key={`clip-${s.title}`} value={i}>{s.title} by {s.artist}</option>
             })
           }
         </select>
-
+        <audio src={audioUrl} controls></audio>
         <button style={{
           marginLeft: 'auto'
         }}
