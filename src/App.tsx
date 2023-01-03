@@ -78,18 +78,23 @@ function BgmSlider({bgm, onChange, onRemove, duration, metrics}: BgmSliderProps)
             const resp = await fetchSongs(bgm.mood, bgm.genre);
             const newBgm = { ...bgm };
             newBgm.songs = resp.data;
-            newBgm.clipId = newBgm.songs[0].id;
+            if (newBgm.songs.length > 0) {
+              newBgm.clipId = newBgm.songs[0].id;
+              setAudioUrl(BASE_URL + newBgm.songs[0].url);
+            }
+            else {
+              newBgm.clipId = undefined;
+              setAudioUrl('');
+            }
             onChange(newBgm);
-            setAudioUrl(BASE_URL + newBgm.songs[0].url);
           }}
         >Search</button>
 
-        <label htmlFor="aclip">Choose a car:</label>
+        <label htmlFor="aclip">Choose a clip:</label>
         <select name="aclip" id="aclip" value={bgm.clipId} onChange={(e) => {
           const newBgm = { ...bgm };
           const index = parseInt(e.target.value);
           newBgm.clipId = bgm.songs[index].id;
-          console.log(bgm.songs[index])
           setAudioUrl(BASE_URL + bgm.songs[index].url);
           onChange(newBgm);
         }}>
