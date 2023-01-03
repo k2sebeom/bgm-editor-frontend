@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import './App.css'
 import { Slider } from '@mui/material';
 import { FileUploader } from 'react-drag-drop-files';
@@ -6,28 +6,31 @@ import { fetchMetrics } from './api';
 
 
 type Bgm = {
-  start: number;
-  end: number;
+  range: number[];
+  genre: string;
+  mood: string;
   clipId?: number;
 }
 
 type BgmSliderProps = {
+  bgm: Bgm;
   onRemove: () => void;
+  onChange: (bgm: Bgm) => void;
   duration: number;
   metrics: any;
 }
 
-function BgmSlider({onRemove, duration, metrics}: BgmSliderProps) {
-  const [val, setVal] = useState<number[]>([0, 10]);
-
+function BgmSlider({bgm, onChange, onRemove, duration, metrics}: BgmSliderProps) {
   return (
     <div style={{
       width: '100%'
     }}>
       <Slider
-        value={val}
+        value={bgm.range}
         onChange={(e, newVal) => {
-          setVal(newVal as number[]);
+          const newBgm = { ...bgm };
+          newBgm.range = newVal as number[];
+          onChange(newBgm);
         }}
         min={0}
         max={duration}
@@ -35,7 +38,11 @@ function BgmSlider({onRemove, duration, metrics}: BgmSliderProps) {
       />
       <div className='hstack'>
         <label htmlFor="genre">Genre:</label>
-        <select name="genre" id="genre">
+        <select name="genre" id="genre" value={bgm.genre} onChange={(e) => {
+          const newBgm = { ...bgm };
+          newBgm.genre = e.target.value;
+          onChange(newBgm);
+        }}>
           {
             metrics.genre.map((g: any) => {
               return <option key={`genre-${g}`} value={g}>{g}</option>
@@ -44,7 +51,11 @@ function BgmSlider({onRemove, duration, metrics}: BgmSliderProps) {
         </select>
 
         <label htmlFor="mood">Mood:</label>
-        <select name="mood" id="mood">
+        <select name="mood" id="mood" value={bgm.mood} onChange={(e) => {
+          const newBgm = { ...bgm };
+          newBgm.mood = e.target.value;
+          onChange(newBgm);
+        }}>
           {
             metrics.mood.map((m: any) => {
               return <option key={`mood-${m}`} value={m}>{m}</option>
@@ -91,6 +102,14 @@ function App() {
       setMetrics(data.data);
     })
   }, []);
+
+  const handleBgmUpdate = useCallback((bgm: Bgm, index: number) => {
+    setBgms((prev: Bgm[]) => {
+      const newBgm = [...prev];
+      newBgm[index] = bgm;
+      return newBgm;
+    })
+  }, [setBgms]);
 
   return (
     <div className='container'>
@@ -148,6 +167,7 @@ function App() {
         bgms.map((bgm: Bgm, i: number) => {
           return (
             <BgmSlider
+              bgm={bgm}
               metrics={metrics}
               key={`bgm-slider-${i}`}
               duration={duration}
@@ -159,6 +179,9 @@ function App() {
                   return newBgm;
                 })
               }}
+              onChange={(bgm: Bgm) => {
+                handleBgmUpdate(bgm, i);
+              }}
             />
           )
         })
@@ -166,7 +189,7 @@ function App() {
 
       <button onClick={() => {
         setBgms((prev: Bgm[]) => {
-          const newBgm = [...prev, { start: 0, end: 0}];
+          const newBgm = [...prev, { range: [0, 0], genre: metrics.genre[0], mood: metrics.mood[0] }];
           return newBgm;
         })
       }}>New BGM</button>
