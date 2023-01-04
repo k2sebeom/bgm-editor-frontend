@@ -149,9 +149,15 @@ function App() {
     <div className='container'>
       <FileUploader
         handleChange={(file: File) => {
-          const path = URL.createObjectURL(file);
-          setVideoUrl(path);
-          setVideoFile(file);
+          const mbSize = file.size / 1024 / 1024;
+          if(mbSize > 100) {
+            alert("You can only process videos under 100 MB")
+          }
+          else {
+            const path = URL.createObjectURL(file);
+            setVideoUrl(path);
+            setVideoFile(file);
+          }
         }}
         types={['mp4', 'mov', 'webm']}
       />
@@ -232,8 +238,13 @@ function App() {
         if(videoFile !== null) {
           setProcessedUrl('');
           setIsProcessing(true);
-          const data = await submitVideo(videoFile, bgms);
-          setProcessedUrl(URL.createObjectURL(data));
+          try {
+            const data = await submitVideo(videoFile, bgms);
+            setProcessedUrl(URL.createObjectURL(data));
+          }
+          catch {
+            alert("Error processing the video")
+          }
           setIsProcessing(false);
         }
       }}>{!isProcessing ? "Generate" : "Processing..."}</button>
